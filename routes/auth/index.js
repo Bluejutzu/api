@@ -11,7 +11,7 @@ const DASHBOARD_URL = "https://ticketit.vercel.app";
 
 router.get("/signin", (req, res) => {
   res.redirect(
-    `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fauth%2Fcallback&scope=guilds+identify`
+    `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=https%3A%2F%2Fapi-ticket-it.vercel.app%2Fauth%2Fcallback&scope=identify+guilds`
   );
 });
 
@@ -19,7 +19,7 @@ router.get("/callback", async (req, res) => {
   const DISCORD_ENDPOINT = "https://discord.com/api/v10";
   const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
   const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-  const REDIRECT_URI = "http://localhost:3001/auth/callback";
+  const REDIRECT_URI = "https://api-ticket-it.vercel.app/auth/callback";
 
   const { code } = req.query;
 
