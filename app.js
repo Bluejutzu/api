@@ -27,8 +27,8 @@ if (!process.env.MONGODB_URI) {
 mongoose.connect("mongodb://localhost:27017/dev").then(() => {
   console.log('Connected to database.');
   
-  app.listen(process.env.PORT, () => {
-    console.log(`Listening on Domain ${Domain}`);
+  app.listen(3000, () => {
+    console.log(`Listening on Domain 3000`);
   });
 });
 
