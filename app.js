@@ -19,7 +19,6 @@ app.use('/', baseRouter);
 app.get('/', (req, res) => {
   res.send("Hello world")
 })
-const Domain = '3001';
 
 if (!process.env.MONGODB_URI) {
   throw new Error('MONGODB_URI required in .env');
@@ -28,7 +27,7 @@ if (!process.env.MONGODB_URI) {
 mongoose.connect("mongodb://localhost:27017/dev").then(() => {
   console.log('Connected to database.');
   
-  app.listen(Domain, () => {
+  app.listen(process.env.PORT, () => {
     console.log(`Listening on Domain ${Domain}`);
   });
 });
