@@ -31,3 +31,5 @@ mongoose.connect("mongodb://localhost:27017/dev").then(() => {
     console.log(`Listening on Domain ${Domain}`);
   });
 });
+
+module.exports = app
