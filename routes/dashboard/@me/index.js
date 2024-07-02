@@ -25,13 +25,16 @@ router.get("/guilds", async (req, res) => {
   const skipCache = req.query.skipcache;
 
   if (!skipCache) {
-    if (redis) {
-      const redisCacheRes = await redis.get(`user-guilds:${req.user.id}`);
+      try {
+        const redisCacheRes = await redis.get(`user-guilds:${req.user.id}`);
 
-      if (redisCacheRes) {
-        return res.status(200).json(JSON.parse(redisCacheRes));
+        if (redisCacheRes) {
+          return res.status(200).json(JSON.parse(redisCacheRes));
+        }
+      } catch (err) {
+        console.error("Redis error:", err);
       }
-    }
+    
   }
 
   const guildsRes = await fetch(`${DISCORD_ENDPOINT}/users/@me/guilds`, {
@@ -68,15 +71,22 @@ router.get("/guilds", async (req, res) => {
   const commonGuilds = simGuilds.filter((guild) =>
     hasPermissions(guild.permissions, "Administrator")
   );
+
   console.log("Common guilds:", commonGuilds);
-  if (redis) {
-    await redis.set(
-      `user-guilds:${req.user.id}`,
-      JSON.stringify(commonGuilds),
-      "EX",
-      600
-    );
-  }
+
+  
+    try {
+      await redis.set(
+        `user-guilds:${req.user.id}`,
+        JSON.stringify(commonGuilds),
+        {
+          EX: 600,
+        }
+      );
+    } catch (err) {
+      console.error("Redis error:", err);
+    }
+  
 
   res.status(200).json(commonGuilds);
 });
