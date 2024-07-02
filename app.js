@@ -24,7 +24,7 @@ if (!process.env.MONGODB_URI) {
   throw new Error('MONGODB_URI required in .env');
 }
 
-mongoose.connect("mongodb://localhost:27017/dev").then(() => {
+mongoose.connect(process.env.MONGODB_URI).then(() => {
   console.log('Connected to database.');
 });
 
