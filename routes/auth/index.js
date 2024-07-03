@@ -64,26 +64,6 @@ router.get("/callback", async (req, res) => {
   }
 
   const userResJson = await userRes.json();
-
-  let user = await User.findOne({ id: userResJson.id });
-
-  if (!user) {
-    user = new User({
-      id: userResJson.id,
-      username: userResJson.username,
-      avatarHash: userResJson.avatar,
-      accessToken: oauthResJson.access_token,
-      refreshToken: oauthResJson.refresh_token,
-    });
-  } else {
-    user.username = userResJson.username;
-    user.avatarHash = userResJson.avatar;
-    user.accessToken = oauthResJson.access_token;
-    user.refreshToken = oauthResJson.refresh_token;
-  }
-
-  await user.save();
-
   const token = jwt.sign(
     {
       id: userResJson.id,
@@ -94,16 +74,29 @@ router.get("/callback", async (req, res) => {
     { expiresIn: "7d" }
   );
 
+  let user = await User.findOne({ id: userResJson.id });
+
+  if (!user) {
+    user = new User({
+      id: userResJson.id,
+      username: userResJson.username,
+      avatarHash: userResJson.avatar,
+      accessToken: oauthResJson.access_token,
+      refreshToken: oauthResJson.refresh_token,
+      token: token
+    });
+  } else {
+    user.username = userResJson.username;
+    user.avatarHash = userResJson.avatar;
+    user.accessToken = oauthResJson.access_token;
+    user.refreshToken = oauthResJson.refresh_token;
+    user.token = token
+  }
+
+  await user.save();
+
   res
     .status(200)
-    .cookie("token", token, {
-      domain: ".vercel.app",
-      path: "/",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "development",
-      maxAge: 6.048e8,
-      // sameSite: ''
-    })
     .redirect(DASHBOARD_URL);
 });
 
