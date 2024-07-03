@@ -1,15 +1,16 @@
 const express = require("express");
 const hasPermissions = require("../../../lib/utils");
 const redis = require("../../../lib/redis");
+const User = require("../../../models/User");
 require("dotenv/config");
 
 const router = express.Router();
 
 const DISCORD_ENDPOINT = "https://discord.com/api/v10";
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   if (req.user) {
-    const { accessToken, refreshToken, ...user } = req.user;
+    const user = await User.findOne({id: req.user.id});
 
     res.status(200).json(user);
   } else {
@@ -18,8 +19,9 @@ router.get("/", (req, res) => {
 });
 
 router.get("/guilds", async (req, res) => {
-  if (!req.user?.accessToken) {
-    return res.status(401).json({ message: "Not logged in" });
+  let user = await User.findOne({id: req.user.id})
+  if (!user.accessToken) {
+    return res.status(401).json({ message: "No Access token found" });
   }
 
   const skipCache = req.query.skipcache;
@@ -38,7 +40,7 @@ router.get("/guilds", async (req, res) => {
 
   const guildsRes = await fetch(`${DISCORD_ENDPOINT}/users/@me/guilds`, {
     headers: {
-      Authorization: `Bearer ${req.user.accessToken}`,
+      Authorization: `Bearer ${user.accessToken}`,
     },
   });
 
@@ -75,7 +77,7 @@ router.get("/guilds", async (req, res) => {
 
   try {
     await redis.set(
-      `user-guilds:${req.user.id}`,
+      `user-guilds:${user.id}`,
       JSON.stringify(commonGuilds),
       {
         EX: 600,
