@@ -9,14 +9,16 @@ require("dotenv/config");
 
 const app = express();
 const corsOptions = {
-  origin: 'https://ticketit.vercel.app',
-  credentials: true
-}
+  origin: "https://ticketit.vercel.app",
+  credentials: true,
+  optionsSuccessStatus: 200, // For legacy browser support
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use("/", baseMiddleware);
 app.use("/", baseRouter);
