@@ -9,13 +9,13 @@ const router = express.Router();
 
 const DASHBOARD_URL = "https://ticketit.vercel.app";
 
-router.get("/signin", (req, res) => {
+router.get("/signin", (req: any, res: any) => {
   res.redirect(
     `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&response_type=code&redirect_uri=https%3A%2F%2Fapi-ticket-it.vercel.app%2Fauth%2Fcallback&scope=identify+guilds`
   );
 });
 
-router.get("/callback", async (req, res) => {
+router.get("/callback", async (req: any, res: any) => {
   const DISCORD_ENDPOINT = "https://discord.com/api/v10";
   const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
   const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -32,8 +32,8 @@ router.get("/callback", async (req, res) => {
   const oauthRes = await fetch(`${DISCORD_ENDPOINT}/oauth2/token`, {
     method: "POST",
     body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: CLIENT_ID!,
+      client_secret: CLIENT_SECRET!,
       grant_type: "authorization_code",
       redirect_uri: REDIRECT_URI,
       code,
@@ -45,7 +45,7 @@ router.get("/callback", async (req, res) => {
 
   if (!oauthRes.ok) {
     console.log("error", oauthRes);
-    res.send('error')
+    res.send("error");
     return;
   }
 
@@ -97,7 +97,7 @@ router.get("/callback", async (req, res) => {
   res
     .status(200)
     .cookie("token", token, {
-      path: '/',
+      path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "development",
       maxAge: 6.048e8,
@@ -106,7 +106,7 @@ router.get("/callback", async (req, res) => {
     .redirect(DASHBOARD_URL);
 });
 
-router.get("/signout", (req, res) => {
+router.get("/signout", (req: any, res: any) => {
   res.clearCookie("token").sendStatus(200);
 });
 

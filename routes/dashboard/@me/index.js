@@ -1,5 +1,5 @@
 const express = require("express");
-const { hasPermissions } = require("../../../lib/utils");
+const hasPermissions = require("../../../lib/utils");
 const redis = require("../../../lib/redis");
 require("dotenv/config");
 
@@ -25,16 +25,15 @@ router.get("/guilds", async (req, res) => {
   const skipCache = req.query.skipcache;
 
   if (!skipCache) {
-      try {
-        const redisCacheRes = await redis.get(`user-guilds:${req.user.id}`);
+    try {
+      const redisCacheRes = await redis.get(`user-guilds:${req.user.id}`);
 
-        if (redisCacheRes) {
-          return res.status(200).json(JSON.parse(redisCacheRes));
-        }
-      } catch (err) {
-        console.error("Redis error:", err);
+      if (redisCacheRes) {
+        return res.status(200).json(JSON.parse(redisCacheRes));
       }
-    
+    } catch (err) {
+      console.error("Redis error:", err);
+    }
   }
 
   const guildsRes = await fetch(`${DISCORD_ENDPOINT}/users/@me/guilds`, {
@@ -74,19 +73,17 @@ router.get("/guilds", async (req, res) => {
 
   console.log("Common guilds:", commonGuilds);
 
-  
-    try {
-      await redis.set(
-        `user-guilds:${req.user.id}`,
-        JSON.stringify(commonGuilds),
-        {
-          EX: 600,
-        }
-      );
-    } catch (err) {
-      console.error("Redis error:", err);
-    }
-  
+  try {
+    await redis.set(
+      `user-guilds:${req.user.id}`,
+      JSON.stringify(commonGuilds),
+      {
+        EX: 600,
+      }
+    );
+  } catch (err) {
+    console.error("Redis error:", err);
+  }
 
   res.status(200).json(commonGuilds);
 });
