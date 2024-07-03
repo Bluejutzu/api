@@ -1,31 +1,35 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const baseRouter = require('./routes/base-router');
-const path = require('path');
-const baseMiddleware = require('./middlewares/base-middleware');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
-require('dotenv/config');
+const express = require("express");
+const mongoose = require("mongoose");
+const baseRouter = require("./routes/base-router");
+const path = require("path");
+const baseMiddleware = require("./middlewares/base-middleware");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+require("dotenv/config");
 
 const app = express();
+const corsOptions = {
+  origin: 'https://ticketit.vercel.app',
+  credentials: true
+}
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
-app.use(cors({ credentials: true, origin: 'http://ticketit.vercel.app'  }));
+app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use('/', baseMiddleware);
-app.use('/', baseRouter);
-app.get('/', (req, res) => {
-  res.send("Hello world")
-})
+app.use("/", baseMiddleware);
+app.use("/", baseRouter);
+app.get("/", (req, res) => {
+  res.send("Hello world");
+});
 
 if (!process.env.MONGODB_URI) {
-  throw new Error('MONGODB_URI required in .env');
+  throw new Error("MONGODB_URI required in .env");
 }
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
-  console.log('Connected to database.');
+  console.log("Connected to database.");
 });
 
-module.exports = app
+module.exports = app;
